@@ -1,11 +1,20 @@
+// == Definitions: ==
+
+// Statebus variables
 var master = require('statebus')(),
-    app = require('express')(),
-    port = 3008,
+    mstate = master.state,
+    link = master.link,
     raw = master.raw
+
+// HTTP variables
+var app = require('express')(),
+    port = 3008
+
+// Funcargs libraries are cool
 var funcarg_parser = require('./parser'),
     funcarg_string = funcarg_parser.stringify_kson
 
-//     uber_bus = parse.upgrade_bus(master)
+// == Set things up! ==
 
 // Create the HTTP server
 var http_server = require('http').createServer()
@@ -19,7 +28,10 @@ master.libs.file_store()       // Persist state onto disk
 master.libs.serve_clientjs()
 master.libs.sockjs_server(http_server)
 
-// Install express
+// Migrate state
+require('./migrations')(master)
+
+// Setup express
 http_server.on('request', (req, res, next) => {
     // But express must ignore all sockjs requests
     if (req.url.startsWith('/'+master.options.websocket_path+'/'))
@@ -28,16 +40,14 @@ http_server.on('request', (req, res, next) => {
         app(req, res)
 })
 
-
-// Migrate state raw before we set up setters
-require('./migrations')(master)
-
-var mstate = master.state,
-    link = master.link
-master.state['@toomim'] = 3
-
-
+// Setup routs for client code
 master.http.get('/', (req, res) => res.sendFile(__dirname + '/client.html'))
+
+// Serve other state from our statebus
+master.http.use(master.libs.http_in)
+
+
+// == Define the Getters and Setters ==
 
 master.custom_clients = (client, client_id) => {
     client.honk = 1
@@ -217,10 +227,21 @@ master.custom_clients = (client, client_id) => {
     })
 }
 
-
 master('tags', {
     default: []   // Todo: implement default in statebus
 })
+
+/*
+master('@*', {
+    set: (key, val, old, t) => {
+        if (!old.joined)
+            val.joined = Date.now()
+    }
+})
+*/
+
+
+// == Compute the WOO!!! ==
 
 function compute_woo ({username, tag}) {
 
@@ -334,18 +355,4 @@ function compute_woo ({username, tag}) {
     // need to return an array of votes.
     return Object.values(votes).map(link)
 }
-
-
-
-/*
-master('@*', {
-    set: (key, val, old, t) => {
-        if (!old.joined)
-            val.joined = Date.now()
-    }
-})
-*/
-
-// Serve other state from statebus
-app.use(master.libs.http_in)
 
