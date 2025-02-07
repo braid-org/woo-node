@@ -245,7 +245,7 @@ function compute_woo ({username, tag}) {
 
     // Network-spread weighting
     var MIN_WEIGHT = 0.05
-    // var MAX_DEPTH = 5
+    var MAX_DEPTH = 5
 
 
     // We calculate w(x, y): the weight of user y from the perspective
@@ -253,8 +253,8 @@ function compute_woo ({username, tag}) {
     // across all paths to user y from user x.
     //
     // w(x, y) :=
-    //    let l = min(minimum length of all paths x -> y, 5) 
-    //    let P = { p : path x -> y | length(p) = l and |Product_{j=1}^(l-1) p_j| >= 0.05}
+    //    let l = min(minimum length of all paths x -> y, MAX_DEPTH) 
+    //    let P = { p : path x -> y | length(p) = l and |Product_{j=1}^(l-1) p_j| >= MIN_WEIGHT}
     //    return Sum_{i=1}^{|P|} Product_{j=1}^l (P_i)_j
     //
     // Then we return W(x) = { y: w(x, y), ... } for all y
@@ -278,7 +278,7 @@ function compute_woo ({username, tag}) {
     // path weighted at 1.0
     queue_cur[username] = [1.0]
 
-    while (Object.keys(queue_cur).length && depth < 5) {
+    while (Object.keys(queue_cur).length && depth < MAX_DEPTH) {
         for (var [target, paths] of Object.entries(queue_cur)) {
             var vote_computed = depth !== 1
             var vote_key = (username + '/vote/' + target
@@ -332,7 +332,7 @@ function compute_woo ({username, tag}) {
         // buffers and process the next depth.
         queue_cur = queue_next
         queue_next = {}
-        if (++depth >= 5) break
+        if (++depth >= MAX_DEPTH) break
 
         // We want to fallback a vote on the default user at depth 2,
         // so that it'll be considered computed.
