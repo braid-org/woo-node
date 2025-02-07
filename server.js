@@ -169,20 +169,6 @@ master.custom_clients = (client, client_id) => {
         }
     })
 
-    /*
-    // Custom user
-    client(':userid', {
-        set: (key, val, old, t) => {
-            if (old.joined !== val.joined)
-                return t.abort()
-            if (old.border !== val.border)
-                return t.abort()
-            master.set(val)
-            t.done(val)
-        }
-    })
-    */
-
     var filter_votes = (votes, tag, voters) =>
         votes.filter( vote =>
                 voters ? vote.voter : true
@@ -225,20 +211,32 @@ master.custom_clients = (client, client_id) => {
         get: () => mstate.tags || [],     // Get from master; default to []
         set: t => t.abort()               // Block all writes
     })
+
+    // // Custom user
+    // client(':userid', {
+    //     set: (key, val, old, t) => {
+    //         if (old.joined !== val.joined)
+    //             return t.abort()
+    //         if (old.border !== val.border)
+    //             return t.abort()
+    //         master.set(val)
+    //         t.done(val)
+    //     }
+    // })
 }
 
 master('tags', {
     default: []   // Todo: implement default in statebus
 })
 
-/*
-master('@*', {
-    set: (key, val, old, t) => {
-        if (!old.joined)
-            val.joined = Date.now()
-    }
-})
-*/
+
+// master('@*', {
+//     set: (key, val, old, t) => {
+//         if (!old.joined)
+//             val.joined = Date.now()
+//     }
+// })
+
 
 
 // == Compute the WOO!!! ==
