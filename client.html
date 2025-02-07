@@ -3,7 +3,9 @@ dom.BODY = ->
   DIV {},
     H1 'Hello world!'
     DIV 'hi hi hi'
-    state['/foo']
+    DIV 'test test test'
+    P "Let's print the names of: ", B state['/@rafie'].name, ' and ', state['/@Mike'].name
+    DIV MARK CODE JSON.stringify(state['/@Mike/vote/post/awm2a6l3pg(tag:hci)'])
 
 </script>
 <script src='/client.js'></script>

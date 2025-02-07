@@ -61,7 +61,7 @@ master.custom_clients = (client, client_id) => {
     // Vote getter and setter
     client(':user/vote/*()', {
 
-        get: (key, star, func_args, t) => {
+        get: (key, path, star, func_args, t) => {
             var {user} = path,
                 slug = star,
                 {computed, tag} = func_args
@@ -100,7 +100,7 @@ master.custom_clients = (client, client_id) => {
             if (val.tag === null || val.tag === undefined)
                 val.tag = 'null'
 
-            var validated_schema = bus.validate(val, {
+            var valid_schema = bus.validate(val, {
                 // The main vote fields
                 from: 'object',
                 to: 'object',
@@ -113,7 +113,7 @@ master.custom_clients = (client, client_id) => {
                 '?updated': 'number',
             })
 
-            var valid_mutation = validated_schema
+            var valid_mutation = valid_schema
                  // User is authorized
                  && (curr.logged_in && raw(curr).user.link === userid
                      && userid === raw(vote).user.link)
