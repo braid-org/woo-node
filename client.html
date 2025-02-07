@@ -1,0 +1,14 @@
+<script type=coffee>
+dom.BODY = ->
+  DIV {},
+    H1 'Hello world!'
+    DIV 'hi hi hi'
+    state['/foo']
+
+</script>
+<script src='/client.js'></script>
+<script>
+  state = bus.state
+  bus.libs.react12.coffreact()
+  bus.ws_mount('/*', '/')
+</script>
