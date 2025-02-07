@@ -169,12 +169,14 @@ master.custom_clients = (client, client_id) => {
         }
     })
 
-    var filter_votes = (votes, tag, voters) =>
-        votes.filter( vote =>
+    function filter_votes (votes, tag, voters) {
+        // Filter `votes` to just those matching `tag` and `voters`
+        return votes.filter( vote =>
                 voters ? vote.voter : true
                 &&
                 tag ? tag === vote.tag : true
         ).map(link)
+    }
 
     // Votes from a user
     client(':user/votes()', {
