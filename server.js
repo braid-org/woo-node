@@ -242,11 +242,11 @@ master('tags', {
 // == Compute the WOO!!! ==
 
 function compute_woo ({username, tag}) {
+    // We'll be crawling a breadth-first path through the network, multiplying
+    // each crawled path by the product of reputation of each hop.
 
-    // Network-spread weighting
-    var MIN_WEIGHT = 0.05
-    var MAX_DEPTH = 5
-
+    var MIN_WEIGHT = 0.05     // The minimum weight before we ignore a crawl path
+    var MAX_DEPTH = 5         // The maximum depth we traverse in the woo
 
     // We calculate w(x, y): the weight of user y from the perspective
     // of user x.  This weight is computed from a breadth-first-search
