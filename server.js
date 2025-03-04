@@ -10,9 +10,24 @@ var master = require('statebus')(),
 var app = require('express')(),
     port = 3008
 
-// Funcargs libraries are cool
-var funcarg_parser = require('./parser'),
-    funcarg_string = funcarg_parser.stringify_kson
+// Funcargs are cool
+var funcarg_string = obj => {
+    var inner = Object.entries(obj)
+        // Allowed values in KSON are: object, string, true
+        // Arrays are in fact objects, and we don't need to treat them differently.
+        // Their order won't change!
+        .filter(([k, v]) => v)
+        .sort()
+        .map(([k, v]) => {
+            if (typeof v === "boolean") return k
+            if (typeof v === "string") return `${k}:${v}`
+            if (typeof v === "object") return `${k}:${funcarg_string(v)}`
+            return ""
+        })
+        .join(",")
+    return inner.length ? `(${inner})` : ""
+}
+
 
 // == Set things up! ==
 
