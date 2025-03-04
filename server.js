@@ -64,7 +64,7 @@ master.custom_clients = (client, client_id) => {
         get: (key, path, star, func_args, t) => {
             var {user} = path,
                 slug = star,
-                {computed, tag} = func_args
+                {computed, tag} = func_args || {}
 
             // If the raw vote exists, return it
             var raw_vote = mstate[user + '/vote/' + slug + funcarg_string({tag})]
@@ -78,7 +78,7 @@ master.custom_clients = (client, client_id) => {
                 var woo = cstate[user +'/votes/'+ funcarg_string({...func_args, voters: true})]
 
                 // Now search for the vote in there
-                for (var vote of raw(woo))
+                for (var vote of woo)
                     if (vote.link === key)
                         // We found it!  Return its state.
                         return mstate[vote.link]
@@ -97,29 +97,29 @@ master.custom_clients = (client, client_id) => {
             var curr = cstate.current_user
 
             // Creating a vote without a tag is equivalent to tag = "null"
-            if (val.tag === null || val.tag === undefined)
-                val.tag = 'null'
+            if (vote.tag === null || vote.tag === undefined)
+                vote.tag = 'null'
 
-            var valid_schema = bus.validate(val, {
+            var valid_schema = bus.validate(vote, {
                 // The main vote fields
-                from: 'object',
-                to: 'object',
+                from:   'link',
+                to:     'link',
                 amount: 'number',
-                tag: 'string',
+                tag:    'string',
 
                 // Optional fields
                 '?voter': 'boolean',
                 '?computed': 'boolean',
-                '?updated': 'number',
+                '?date': 'number',
             })
 
             var valid_mutation = valid_schema
                  // User is authorized
-                 && (curr.logged_in && raw(curr).user.link === userid
-                     && userid === raw(vote).user.link)
+                 && (curr.logged_in && curr.user.link === userid
+                     && userid === vote.user.link)
                                   
                  // Key matches contents
-                 && (slug === raw(vote).to.link)
+                 && (slug === vote.to.link)
 
                  // The (tag:name) matches vote.tag == name
                  && (tag ?? 'null') === vote.tag
@@ -138,8 +138,8 @@ master.custom_clients = (client, client_id) => {
 
             // // # User votes should be given depth 1
             // // TODO: Is this still appropriate?  I'm changing depth -> computed.
-            // if (val.voter)
-            //     val.depth = 1
+            // if (vote.voter)
+            //     vote.depth = 1
 
             // Now store it on master!
             mstate[key] = vote

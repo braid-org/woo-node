@@ -1,11 +1,19 @@
 <script type=coffee>
 dom.BODY = ->
+  window.avote = state['/@Mike/vote/post/awm2a6l3pg(tag:hci)']
+  window.bvote = state['/@rafie/vote/@lazyjeff']
   DIV {},
     H1 'Hello world!'
     DIV 'hi hi hi'
     DIV 'test test test'
     P "Let's print the names of: ", B state['/@rafie'].name, ' and ', state['/@Mike'].name
-    DIV MARK CODE JSON.stringify(state['/@Mike/vote/post/awm2a6l3pg(tag:hci)'])
+    for vote in [avote, bvote]
+      DIV {},
+        DIV MARK CODE JSON.stringify(vote)
+        UL {},
+          LI 'From: ', JSON.stringify(vote.from())
+          LI 'To: ',   JSON.stringify(vote.to())
+
 
 </script>
 <script src='/client.js'></script>

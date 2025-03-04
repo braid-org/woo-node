@@ -71,7 +71,7 @@ function migrate (master) {
         master.set(user_passes)
         console.log('Now user_passes is', user_passes)
 
-        // Convert votes
+        // Convert individual votes
         Object.keys(master.cache)
             .filter(k => k.includes('/vote/'))
             .forEach(k => {
@@ -95,6 +95,16 @@ function migrate (master) {
                 vote.val.amount = vote.val.value
                 delete vote.val.value
 
+                // Convert "updated" to "date"
+                vote.val.date = vote.val.updated
+                delete vote.val.updated
+
+                // Add .voter if this is a user
+                if (!vote.val.to)
+                    console.log('Missing to on vote', vote)
+                if (vote.val.to.link.startsWith('@'))
+                    vote.val.voter = true
+
                 // Convert depth > 1 to computed: true
                 var depth = vote.val.depth
                 if (depth > 1)
@@ -115,7 +125,7 @@ function migrate (master) {
                     master.set(vote)
             })
 
-        // Convert '*votes*'
+        // Convert lists of votes, aka '*votes*'
         Object.keys(master.cache)
             .filter(k => k.includes('votes'))
             .filter(k => !k.includes('votes_'))
