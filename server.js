@@ -115,7 +115,7 @@ master.custom_clients = (client, client_id) => {
             if (vote.tag === null || vote.tag === undefined)
                 vote.tag = 'null'
 
-            var valid_schema = bus.validate(vote, {
+            var valid_schema = client.validate(vote, {
                 // The main vote fields
                 from:   'link',
                 to:     'link',
